@@ -1,0 +1,80 @@
+<div class="h-screen w-full flex flex-row items-center bg-amber-50">
+  <div class="w-1/2 h-full flex items-center justify-center">
+    <div
+      [ngClass]="isTailwindClass ? selectedColor : ''"
+      [style.backgroundColor]="!isTailwindClass ? selectedColor : null"
+      class="px-5 py-5 size-fit"
+      id="photostrip"
+    >
+      <div *ngFor="let img of images" class="mb-2 mt-1">
+        <img [src]="img" class="h-32 w-sm object-scale-down" />
+      </div>
+    </div>
+  </div>
+  <div class="w-1/2 h-full p-2">
+    <div class="h-1/5"></div>
+    <div
+      class="color-selection flex flex-row gap-2 items-center h-1/5 w-1/2 flex-wrap"
+    >
+      <button
+        *ngFor="let combo of colorRangeCombos"
+        class="rounded-full ring-4 ring-white p-4"
+        [ngClass]="[
+          'bg-' + combo.color + '-' + combo.range,
+          selectedColor === 'bg-' + combo.color + '-' + combo.range
+            ? 'ring-8 ring-black'
+            : ''
+        ]"
+        (click)="changeColor(combo.color, combo.range)"
+      ></button>
+      <div
+        class="w-10 h-10 rounded-full ring-4 ring-pink-200 overflow-hidden relative shadow-md"
+        style="
+          background-image: linear-gradient(
+            135deg,
+            #fcd5ce,
+            #fae1dd,
+            #d8e2dc,
+            #ece4db,
+            #f0efeb
+          );
+          background-size: 200% 200%;
+          animation: pastelPulse 5s ease infinite;
+        "
+      >
+        <input
+          type="color"
+          class="opacity-0 absolute top-0 left-0 w-full h-full cursor-pointer"
+          (input)="onColorPickerChange($event)"
+        />
+      </div>
+
+      <style>
+        @keyframes pastelPulse {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+      </style>
+    </div>
+    <div class="h-1/5"></div>
+    <div class="h-1/5">
+      <button
+        class="size-min border-4 border-black rounded-xl active:translate-y-2 shadow-md animate-bounce hover:animate-none z-10 disabled:cursor-not-allowed enabled:cursor-pointer"
+          (click)="downloadPhotoStrip()"
+      >
+        <span
+          class="block px-6 py-3 bg-pink-300 text-white font-bold rounded-md text-3xl border-b-8 border-pink-700 border-x-4 active:border-b-4 active:bg-pink-400 font-['Press_Start_2P'] text-nowrap"
+        >
+          DOWNLOAD
+        </span>
+      </button>
+    </div>
+  </div>
+</div>

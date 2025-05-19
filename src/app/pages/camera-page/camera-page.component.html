@@ -1,0 +1,76 @@
+<div
+  class="h-screen w-full flex bg-red-200"
+>
+  <div class="absolute inset-0 z-0 grid-bg pointer-events-none"></div>
+  <div class="w-1/4"></div>
+  <div class="w-1/2 flex flex-col gap-2 items-center justify-center h-full">
+    <div class="h-4/5 w-full flex justify-center items-center">
+      <div>
+        <div
+          class="relative rounded-5xl w-[550px] m-4 overflow-hidden shadow-xl ring-8 ring-gray-100"
+        >
+          <video autoplay #videoElement class="scale-x-[-1]"></video>
+          <div
+            class="absolute inset-0 bg-white bg-opacity-25 text-6xl text-white font-['Press_Start_2P'] flex items-center justify-center"
+            *ngIf="countClicked === true"
+          >
+            {{ count }}
+          </div>
+          <div
+            class="absolute inset-0 bg-white bg-opacity-25 text-3xl text-red-700 text-center font-['Press_Start_2P'] flex items-center justify-center"
+            *ngIf="!cameraEnabled"
+          >
+            CAMERA NOT READY
+          </div>
+        </div>
+
+        <canvas #canvasElement class="hidden"></canvas>
+      </div>
+    </div>
+    <div class="h-1/5 gap-2 flex">
+      <button
+        class="size-min border-4 border-black rounded-xl active:translate-y-2 shadow-md animate-bounce hover:animate-none z-10 disabled:cursor-not-allowed enabled:cursor-pointer"
+        (click)="startCaptureSequence()"
+        *ngIf="captureIndex === 0 && started === false"
+      >
+        <span
+          class="block px-6 py-3 bg-red-500 text-white font-bold rounded-md text-3xl border-b-8 border-red-700 border-x-4 active:border-b-4 active:bg-red-600 font-['Press_Start_2P']"
+        >
+          CAPTURE
+        </span>
+      </button>
+      <button
+        class="size-min border-4 border-black rounded-xl active:translate-y-2 shadow-md animate-bounce hover:animate-none z-10 disabled:cursor-not-allowed enabled:cursor-pointer"
+        (click)="startCaptureSequence()"
+        [disabled]="!cameraEnabled"
+        *ngIf="captureIndex === 4"
+      >
+        <span
+          class="block px-6 py-3 bg-green-500 text-white font-bold rounded-md text-3xl border-b-8 border-green-700 border-x-4 active:border-b-4 active:bg-green-600 font-['Press_Start_2P']"
+        >
+          RETAKE?
+        </span>
+      </button>
+      <button
+        class="size-min border-4 border-black rounded-xl active:translate-y-2 shadow-md animate-bounce hover:animate-none z-10 disabled:cursor-not-allowed enabled:cursor-pointer"
+        *ngIf="captureIndex === 4"
+        (click)="goToNextPage()"
+      >
+        <span
+          class="block px-6 py-3 bg-yellow-500 text-white font-bold rounded-md text-3xl border-b-8 border-yellow-700 border-x-4 active:border-b-4 active:bg-yellow-600 font-['Press_Start_2P'] text-nowrap"
+        >
+          NEXT->
+        </span>
+      </button>
+    </div>
+  </div>
+  <div class="w-1/4 flex justify-center items-center h-full">
+    <div class="flex flex-col gap-2 items-center z-10">
+      <img
+        *ngFor="let img of capturedImages"
+        [src]="img"
+        class="h-32 w-64 object-scale-down"
+      />
+    </div>
+  </div>
+</div>
