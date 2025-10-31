@@ -1,50 +1,29 @@
-<div class="h-screen w-full flex flex-row items-center bg-amber-50">
-  <svg width="0" height="0" style="position:absolute;">
-  <defs>
-    <clipPath id="heartClip" clipPathUnits="objectBoundingBox">
-      <path
-        d="M0.5,0.93
-           C0.15,0.7 0,0.4 0.25,0.15
-           C0.5,-0.1 0.75,0.15 0.75,0.15
-           C1,0.4 0.85,0.7 0.5,0.93Z"
-      />
-    </clipPath>
-  </defs>
-</svg>
+<div class="flex flex-row items-center w-full h-screen bg-amber-50">
+  <div class="absolute inset-0 z-0 pointer-events-none grid-bg"></div>
 
-  <div class="absolute inset-0 z-0 grid-bg pointer-events-none"></div>
-
-  <div class="w-1/2 h-full flex items-center justify-center z-10">
-    <div
-      [ngClass]="isTailwindClass ? selectedColor : ''"
-      [style.backgroundColor]="!isTailwindClass ? selectedColor : null"
-      class="px-5 py-5 size-fit"
-      id="photostrip"
-    >
-      <div *ngFor="let img of images" class="mb-2 mt-1">
-        <img [src]="img" class="h-32 w-sm object-scale-down" />
+  <div class="z-10 flex items-center justify-center w-1/2 h-full">
+    <div id="photostrip" class="px-5 py-5 size-fit" [ngClass]="photostripClass" [ngStyle]="photostripStyle">
+      <div *ngFor="let img of images" class="mt-1 mb-2">
+        <img [src]="img" class="object-scale-down h-32 w-sm" />
       </div>
     </div>
   </div>
-  <div class="w-1/2 h-full p-2 z-10">
+
+  <div class="z-10 w-1/2 h-full p-2">
     <div class="h-1/5"></div>
-    <div
-      class="color-selection flex flex-row gap-2 items-center h-1/5 w-1/2 flex-wrap"
-    >
-      <button
-        *ngFor="let combo of colorRangeCombos"
-        class="rounded-full ring-4 ring-white p-4"
-        [ngClass]="[
+
+    <div class="flex flex-row flex-wrap items-center w-1/2 gap-2 color-selection h-1/5">
+      <!-- Tailwind color chips -->
+      <button *ngFor="let combo of colorRangeCombos" class="p-4 rounded-full ring-4 ring-white" [ngClass]="[
           'bg-' + combo.color + '-' + combo.range,
-          selectedColor === 'bg-' + combo.color + '-' + combo.range
+          bgMode === 'tailwind' && selectedTailwind === ('bg-' + combo.color + '-' + combo.range)
             ? 'ring-8 ring-black'
             : ''
-        ]"
-        (click)="changeColor(combo.color, combo.range)"
-      ></button>
-      <div
-        class="w-10 h-10 rounded-full ring-4 ring-pink-200 overflow-hidden relative shadow-md"
-        style="
+        ]" (click)="changeColor(combo.color, combo.range)" aria-label="Tailwind color"></button>
+
+      <!-- Hex color picker -->
+      <div class="relative w-10 h-10 overflow-hidden rounded-full shadow-md ring-4 ring-pink-200"
+        [ngClass]="bgMode === 'hex' ? 'ring-8 ring-black' : ''" style="
           background-image: linear-gradient(
             135deg,
             #fcd5ce,
@@ -55,13 +34,28 @@
           );
           background-size: 200% 200%;
           animation: pastelPulse 5s ease infinite;
-        "
-      >
-        <input
-          type="color"
-          class="opacity-0 absolute top-0 left-0 w-full h-full cursor-pointer"
-          (input)="onColorPickerChange($event)"
-        />
+        " title="Pick a color">
+        <input type="color" class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer" [value]="selectedHex"
+          (change)="onColorPickerChange($event)" />
+      </div>
+
+      <!-- Image background chooser -->
+      <div class="flex flex-row items-center gap-8">
+        <button class="w-10 h-10 overflow-hidden border border-gray-300 rounded-full"
+          [ngClass]="bgMode === 'image' && selectedImage === '/2.png' ? 'ring-8 ring-black' : ''"
+          (click)="selectBackgroundImage('/2.png')" title="Background image">
+          <img src="/2.png" class="object-cover w-full h-full" />
+        </button>
+        <button class="w-10 h-10 overflow-hidden border border-gray-300 rounded-full"
+          [ngClass]="bgMode === 'image' && selectedImage === '/3.png' ? 'ring-8 ring-black' : ''"
+          (click)="selectBackgroundImage('/3.png')" title="Background image">
+          <img src="/3.png" class="object-cover w-full h-full" />
+        </button>
+        <button class="w-10 h-10 overflow-hidden border border-gray-300 rounded-full"
+          [ngClass]="bgMode === 'image' && selectedImage === '/4.png' ? 'ring-8 ring-black' : ''"
+          (click)="selectBackgroundImage('/4.png')" title="Background image">
+          <img src="/4.png" class="object-cover w-full h-full" />
+        </button>
       </div>
 
       <style>
@@ -69,24 +63,26 @@
           0% {
             background-position: 0% 50%;
           }
+
           50% {
             background-position: 100% 50%;
           }
+
           100% {
             background-position: 0% 50%;
           }
         }
       </style>
     </div>
+
     <div class="h-1/5"></div>
+
     <div class="h-1/5">
       <button
-        class="size-min border-4 border-black rounded-xl active:translate-y-2 shadow-md animate-bounce hover:animate-none z-10 disabled:cursor-not-allowed enabled:cursor-pointer"
-        (click)="downloadPhotoStrip()"
-      >
+        class="z-10 border-4 border-black shadow-md size-min rounded-xl active:translate-y-2 animate-bounce hover:animate-none disabled:cursor-not-allowed enabled:cursor-pointer"
+        (click)="downloadPhotoStrip()">
         <span
-          class="block px-6 py-3 bg-pink-300 text-white font-bold rounded-md text-3xl border-b-8 border-pink-700 border-x-4 active:border-b-4 active:bg-pink-400 font-['Press_Start_2P'] text-nowrap"
-        >
+          class="block px-6 py-3 bg-pink-300 text-white font-bold rounded-md text-3xl border-b-8 border-pink-700 border-x-4 active:border-b-4 active:bg-pink-400 font-['Press_Start_2P'] text-nowrap">
           DOWNLOAD
         </span>
       </button>
